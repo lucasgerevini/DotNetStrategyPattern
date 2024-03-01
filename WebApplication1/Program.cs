@@ -12,7 +12,7 @@ namespace WebApplication1
             builder.Services.AddAuthorization();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            
+
             builder.Services.AddControllers();
 
             builder.Services.AddEndpointsApiExplorer();
@@ -22,6 +22,9 @@ namespace WebApplication1
             builder.Services.AddTransient<ICompanhiaCarga, Allianz>();
 
             var app = builder.Build();
+
+            app.UseMiddleware<RouterMiddleware>();
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

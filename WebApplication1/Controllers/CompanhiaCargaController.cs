@@ -1,35 +1,60 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace WebApplication1.Controllers
+namespace WebApplication1.Controllers;
+
+public class Companhia
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CompanhiaCargaController : ControllerBase
+    public string Nome { get; set; }
+}
+
+[Route($"api/companhia-carga")]
+[ApiController]
+public class CompanhiaCargaController : ControllerBase
+{
+    private readonly IEnumerable<ICompanhiaCarga> companhiaCargas;
+
+    public CompanhiaCargaController(IEnumerable<ICompanhiaCarga> companhiaCargas)
     {
-        private readonly IEnumerable<ICompanhiaCarga> companhiaCargas;
+        this.companhiaCargas = companhiaCargas;
+    }
 
-        public CompanhiaCargaController(IEnumerable<ICompanhiaCarga> companhiaCargas)
+    [HttpGet("{companhia}")]
+    public IActionResult Processar(string companhia)
+    {
+
+        foreach (var item in companhiaCargas)
         {
-            this.companhiaCargas = companhiaCargas;
+            item.Processar();
         }
 
-        [HttpGet("/{companhia}")]
-        public IActionResult Processar(string companhia)
+        var processo = companhiaCargas.FirstOrDefault(filtro => filtro.GetType().Name.Contains(companhia))?.Processar();
+
+        if (processo == null)
         {
-
-            foreach (var item in companhiaCargas)
-            {
-                item.Processar();
-            }
-
-            var processo = companhiaCargas.FirstOrDefault(filtro => filtro.GetType().Name.Contains(companhia))?.Processar();
-
-            if (processo == null)
-            {
-                return NotFound();
-            }
-            Console.WriteLine(companhia);
-            return Ok(processo);
+            return NotFound();
         }
+        Console.WriteLine(companhia);
+        return Ok(processo);
+    }
+
+
+    [HttpPost]
+    [Produces("application/json")]
+    public IActionResult Processar([FromBody]Companhia companhia)
+    {
+
+        foreach (var item in companhiaCargas)
+        {
+            item.Processar();
+        }
+
+        var processo = companhiaCargas.FirstOrDefault(filtro => filtro.GetType().Name.Contains(companhia.Nome))?.Processar();
+
+        if (processo == null)
+        {
+            return NotFound();
+        }
+        Console.WriteLine(companhia);
+        return Ok(processo);
     }
 }
