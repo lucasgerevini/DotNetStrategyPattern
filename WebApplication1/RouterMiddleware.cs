@@ -18,14 +18,6 @@ public class RouterMiddleware
 
         var endpointEhNull = endpoint is null;
 
-        // Verifica se o endpoint obtido é nulo e se a requisição não é para a documentação do Swagger
-        if (endpoint == null && (context.Request.Path != "/swagger/index.html" && context.Request.Path != "/swagger/v1/swagger.json"))
-        {
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            await context.Response.WriteAsync("Erroooou!!");
-            return;
-        }
-
         // Verifica se o endpoint obtido é nulo e se a requisição é para a documentação do Swagger
         if ((!endpointEhNull && !endpointSources.Endpoints.Contains(endpoint)) ||
         // Verifica se o endpoint obtido não é nulo e se o tipo de conteúdo da requisição é JSON
@@ -39,16 +31,4 @@ public class RouterMiddleware
         }
         await next(context);
     }
-
-    public bool TipoConteudoEhJson(bool endpointEhNull, HttpContext context)
-    {
-        return context.Request.ContentType == "application/json";
-    }
-
-    public bool VerificaEndpointExiste(HttpContext context, Endpoint? endpoint, EndpointDataSource endpointSources)
-    {
-        return (endpoint is not null && !endpointSources.Endpoints.Contains(endpoint);
-    }
-
-
 }
